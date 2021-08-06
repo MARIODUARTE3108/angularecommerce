@@ -51,7 +51,6 @@ export class ProductsComponent implements OnInit {
   //função para obter 1 produto na API atraves do ID..
   obterPorId(idProduto: string): void {
     this.produtosService.getById(idProduto)
-
       .subscribe(
         (data) => {
           this.produto = (data as any);
@@ -61,6 +60,44 @@ export class ProductsComponent implements OnInit {
           console.log(e);
         }
       )
+  }
+
+  //função para adicionar um item ao pedido..
+  adicionarItem(item: any): void {
+
+    //iniciando o item com quantidade = 1
+    item.quantidade = 1;
+
+    var cestaDeCompras = []; //array..
+
+    //verificar se já existem produtos adicionados em sessão..    
+    if (localStorage.getItem('CESTA_DE_COMPRAS') != null) {
+      //capturar o conteudo gravado em sessão
+      var dados = localStorage.getItem('CESTA_DE_COMPRAS');
+      cestaDeCompras = JSON.parse(dados as string) as any[];
+    }
+
+    //verificar se o produto ja existe na cesta de compras
+    var produtoJaAdicionado = false;
+
+    for (var i = 0; i < cestaDeCompras.length; i++) {
+      if (item.idProduto == cestaDeCompras[i].idProduto) {
+        cestaDeCompras[i].quantidade++; //incrementando a quantidade
+        produtoJaAdicionado = true;
+      }
+    }
+
+    //verificar se o produto não esta na cesta de compras
+    if (!produtoJaAdicionado) {
+      //adicionar o produto que foi selecionado na página
+      cestaDeCompras.push(item);
+    }
+
+    //gravar novamente os dados da cesta de compras em sessão
+    localStorage.setItem('CESTA_DE_COMPRAS', JSON.stringify(cestaDeCompras));
+
+    //redirecionar para a página de carrinho de compras
+    window.location.href = "/shopping-cart";
   }
 }
 
